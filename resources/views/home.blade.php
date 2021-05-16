@@ -46,10 +46,10 @@
                       <a class="nav-link" href="cart.html"> <i class="fa fa-shopping-basket fa-x5"></i> cart</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/account"><i class="fa fa-user fa-x5"></i> Account </a>
+                        <a class="nav-link" href="/login"><i class="fa fa-user fa-x5"></i> Account </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa fa-reply fa-x5"></i> Log Out </a>
+                        <a class="nav-link" onclick="logout()" style="display: <?php echo ((session('userID') == null || session('userID') == 0) ? 'none;' : 'block;'); ?>"><i class="fa fa-reply fa-x5"></i> Logout </a>
                     </li>
                   </ul>
                 </div>
@@ -1050,6 +1050,7 @@
         <script src="{{ asset('js/jquery.nicescroll.js') }}"></script>
         <script src="{{ asset('js/main-interface.js') }}"></script>
         <script src="{{ asset('js/wow.min.js') }}"></script>
+        @include('js.shared_js')
         <script>
             new WOW().init();
         </script>

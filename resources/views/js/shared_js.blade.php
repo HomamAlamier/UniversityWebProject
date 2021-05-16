@@ -1,13 +1,13 @@
 <script>
 function logout(){
     $.post(
-        '/account',
+        '/login',
         {
             '_token': "<?php echo csrf_token(); ?>",
             'action': "logout"
         },
         function(data){
-            window.location.replace('/account');
+            window.location.replace('/login');
         },
         'json'
     );

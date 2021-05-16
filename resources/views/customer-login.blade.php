@@ -101,9 +101,10 @@
                     <form id="sup_form" class="sign-up">
                         <input type="hidden" name="_token" value="<?php echo csrf_token() ?>">
                         <input type="hidden" name="action" value="signup">
+                        <input type="hidden" name="description" value="No Description">
                         <div class="form-group">
                             <label></label>
-                            <input type="text" class="form-control" name="uname" placeholder="Your Name" id="sup_name" required> 
+                            <input type="text" class="form-control" name="username" placeholder="Your Name" id="sup_name" required> 
                         </div>
 
                         <div class="form-group">
@@ -112,7 +113,7 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="password" class="form-control" name="pass" id="sup_pass" placeholder="Password" required>
+                            <input type="password" class="form-control" name="password" id="sup_pass" placeholder="Password" required>
                         </div>
 
                         <div class="form-group">
@@ -139,18 +140,19 @@
                         
                     </form>
 
-                    <form class="login" action="/account" method="POST">
+                    <form id="login_form" class="login">
                         <input type="hidden" name="_token" value="<?php echo csrf_token() ?>">
                         <input type="hidden" name="action" value="login">
                         <div class="form-group">
-                            <input type="email" class="form-control" name="uname" placeholder="Email" required>
+                            <p style="color: Red;display: none;" id="login_emailErr">We cannot find any account with this email !</p>
+                            <input type="email" class="form-control" name="email" placeholder="Email" required>
                         </div>
 
                         <div class="form-group">
-                            <input type="password" class="form-control" name="pass" placeholder="Password" required>
+                            <p style="color: Red;display: none;" id="login_passwordErr">Incorrect Password !</p>
+                            <input type="password" class="form-control" name="password" placeholder="Password" required>
                         </div>
-                        <button type="submit" class="btn btn-info btn-block" style="margin-bottom: 40px"> Login </button> 
-                        <div class="Social">
+                        <div onclick="loginBtn_click()" class="btn btn-info btn-block" id="loginBtn"> Login </div>                        <div class="Social">
                             <p class="text-center lead"> Or login with </p>
                             <button type="button" class="btn btn-info"> <i class="fa fa-facebook fa-x4"></i> facebook </button>
                             <button type="button" class="btn btn-danger"> <i class="fa fa-google-plus fa-x4"></i> Google </button>
@@ -210,21 +212,50 @@
                 else {
                     document.getElementById('signup_btn').innerHTML = loadingSymbol;
                     $.post(
-                        '/account',
+                        '/login',
                         $('form#sup_form').serialize(),
                         function (data){
                             console.log(data);
-                            if (data['errCode'] == 200){
+                            if (data['ErrorCode'] == 0){
                                 window.location.replace('/accountverfiy?p=1');
                             }
-                            else if (data['errCode'] == 201){
+                            else if (data['ErrorCode'] == 5){
                                 document.getElementById('emailerr').style.display = "block";
                             }
                             document.getElementById('signup_btn').innerHTML = "Create";
                         },
                         'json'
-                    );   
+                    ).fail(function() {
+                        alert("An error occourd while creating the account !")
+                        document.getElementById('signup_btn').innerHTML = "Create";
+                    });
                 }
+            }
+            function loginBtn_click(){
+                document.getElementById('login_emailErr').style.display = "none";
+                document.getElementById('login_passwordErr').style.display = "none";
+                document.getElementById('loginBtn').innerHTML = loadingSymbol;
+                $.post(
+                    '/login',
+                    $('form#login_form').serialize(),
+                    function (data){
+                        console.log(data);
+                        if (data['ErrorCode'] == 0){
+                            window.location.replace('/');
+                        }
+                        else if (data['ErrorCode'] == 3){
+                            document.getElementById('login_emailErr').style.display = "block";
+                        }
+                        else if (data['ErrorCode'] == 4){
+                            document.getElementById('login_passwordErr').style.display = "block";
+                        }
+                        document.getElementById('loginBtn').innerHTML = "Login";
+                    },
+                    'json'
+                ).fail(function() {
+                    alert("An error occourd !")
+                    document.getElementById('signup_btn').innerHTML = "Create";
+                });
             }
             var urlVars = getUrlVars();
             if (urlVars['p'] == "signup"){

@@ -13,6 +13,7 @@ use App\Models\AdminPermissions;
 use App\Models\Media;
 use App\Models\Responses;
 use App\Models\XUser;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller {
    private function _login($email, $pass, $mobile, $devName)
@@ -24,14 +25,16 @@ class LoginController extends Controller {
          return Responses::EmailNotFound();
       }
       if ($user->getData(XUser::Password) == $pass)
-      {
+      {      
          http_response_code(200);
-         $a = $user->basicInfo();
          if ($mobile)
          {
+            $a = $user->basicInfo();
             $a['token'] = $user->createTokenSession($devName);
+            return $a;
          }
-         return $a;
+         session(['userID' => $user->getId()]);
+         return Responses::Success();
       }
       else
       {
@@ -90,5 +93,23 @@ class LoginController extends Controller {
          return response()->json(Responses::BadRequest());
       }
       return response()->json($this->_signup($request->input('email'), $request->input('username'), $request->input('password') , $request->input('address') , $request->input('description'), "", XUser::Customer));
+   }
+   public function webPost(Request $request)
+   {
+      if (!$request->has('action'))
+      {
+         http_response_code(400);
+         return response()->json(Responses::BadRequest());
+      }
+      $action = $request->input('action');
+      if ($action == 'login')
+         return $this->webLogin($request);
+      else if ($action == 'signup')
+         return $this->mobileSignUp($request);
+      else if ($action == 'logout')
+      {
+         session(["userID" => 0]);
+         return Responses::Success();
+      }
    }
 }

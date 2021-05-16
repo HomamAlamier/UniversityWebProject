@@ -16,19 +16,9 @@ class LoginMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $data = session('logined');
-        echo $data;
-        if ($data == null || $data == 0){
+        if ( $request->session()->has('userID') && $request->session()->get('userID') > 0 )
+            return redirect('/');
+        else
             return $next($request);
-        }
-        else {
-            $utype = session('utype');
-            if ($utype == 1)
-                return redirect('/admin/dashboard');
-            else if ($utype == 2) 
-                return redirect('/seller/dashboard');
-            else 
-                return redirect('/');
-        }
     }
 }

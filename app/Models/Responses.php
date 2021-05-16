@@ -13,6 +13,8 @@ class Responses
    const E_EmailExists = 5;
    const E_InvalidToken = 6;
    const E_ExpiredToken = 7;
+
+   
    public static function Success() 
    {
       return ["ErrorCode" => Responses::E_Success
